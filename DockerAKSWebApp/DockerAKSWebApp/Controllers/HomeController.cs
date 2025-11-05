@@ -7,14 +7,19 @@ namespace DockerAKSWebApp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IConfiguration _config;
+        public HomeController(ILogger<HomeController> logger, IConfiguration config)
         {
             _logger = logger;
+            _config = config;
         }
 
         public IActionResult Index()
         {
+            string appName = _config["AppName"] ?? "";
+            ViewBag.appName = appName;
+            string appLogLevel = _config["MyConfig:LogLevel"] ?? "";
+            ViewBag.appLogLevel = appLogLevel;
             return View();
         }
 
