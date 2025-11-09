@@ -17,4 +17,3 @@ spec:
         image: containerregisteryrgelete.azurecr.io/dockerakswebapp:latest
         ports:
         - containerPort: 80
-
