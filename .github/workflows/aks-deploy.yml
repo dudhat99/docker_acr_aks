@@ -45,6 +45,7 @@ jobs:
       - name: Install kubelogin
         run: |
           curl -LO https://github.com/Azure/kubelogin/releases/latest/download/kubelogin-linux-amd64.zip
+          unzip kubelogin-linux-amd64.zip
           sudo unzip kubelogin-linux-amd64.zip -d /usr/local/bin
           sudo chmod +x /usr/local/bin/kubelogin
 
