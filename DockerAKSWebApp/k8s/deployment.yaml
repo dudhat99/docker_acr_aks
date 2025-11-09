@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: dockerapp
-        image: $ACR_LOGIN_SERVER/$IMAGE_NAME:$TAG
+        image: containerregisteryrgelete.azurecr.io/dockerakswebapp:latest
         ports:
         - containerPort: 80
 
