@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dockerapp
+  name: dockerakswebapp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dockerapp
+      app: dockerakswebapp
   template:
     metadata:
       labels:
-        app: dockerapp
+        app: dockerakswebapp
     spec:
       containers:
-      - name: dockerapp
+      - name: dockerakswebapp
         image: containerregisteryrgelete.azurecr.io/dockerakswebapp:latest
         ports:
         - containerPort: 80

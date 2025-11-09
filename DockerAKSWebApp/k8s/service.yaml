@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: dockerapp-svc
   labels:
-    app: dockerapp
+    app: dockerakswebapp
 spec:
   type: LoadBalancer
   selector:
-    app: dockerapp
+    app: dockerakswebapp
   ports:
     - protocol: TCP
       port: 80
