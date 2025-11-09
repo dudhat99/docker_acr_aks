@@ -8,7 +8,7 @@ on:
 env:
   ACR_LOGIN_SERVER: containerregisteryrgelete.azurecr.io
   IMAGE_NAME: dockerakswebapp
-  TAG: ${{ github.sha }}   # Unique tag per commit
+  TAG: ${{ github.sha }}  # unique tag per commit
 
 jobs:
   build-and-deploy:
@@ -24,7 +24,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Login to ACR (uses SP from Azure Login)
+      # Login to ACR
       - name: Login to ACR
         run: az acr login --name containerregisteryrgelete
 
@@ -33,7 +33,7 @@ jobs:
         run: |
           docker build -t ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} -f DockerAKSWebApp/Dockerfile DockerAKSWebApp
 
-      # Push image to ACR
+      # Push Docker image
       - name: Push Docker Image
         run: |
           docker push ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
@@ -56,8 +56,14 @@ jobs:
         run: |
           kubelogin convert-kubeconfig -l azurecli
 
+      # Update deployment YAML with new image tag
+      - name: Update Deployment Image
+        run: |
+          sed -i "s|image: .*|image: ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}|" DockerAKSWebApp/k8s/deployment.yaml
+
       # Deploy to AKS
       - name: Deploy to AKS
         run: |
-          kubectl set image deployment/dockerakswebapp dockerakswebapp=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} --record
+          kubectl apply -f DockerAKSWebApp/k8s/deployment.yaml
+          kubectl apply -f DockerAKSWebApp/k8s/service.yaml
           kubectl rollout status deployment/dockerakswebapp
