@@ -8,37 +8,38 @@ on:
 env:
   ACR_LOGIN_SERVER: containerregisteryrgelete.azurecr.io
   IMAGE_NAME: dockerakswebapp
-  TAG: ${{ github.sha }}  # unique tag per commit
+  TAG: ${{ github.sha }}  # Unique tag per commit
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout the code
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Login to Azure using Service Principal
+      # 2️⃣ Login to Azure using Service Principal
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Login to ACR
+      # 3️⃣ Login to ACR using SP (no username/password needed)
       - name: Login to ACR
         run: az acr login --name containerregisteryrgelete
 
-      # Build Docker image
+      # 4️⃣ Build Docker image
       - name: Build Docker Image
         run: |
           docker build -t ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} -f DockerAKSWebApp/Dockerfile DockerAKSWebApp
 
-      # Push Docker image
+      # 5️⃣ Push Docker image to ACR
       - name: Push Docker Image
         run: |
           docker push ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
 
-      # Optional: install kubelogin if needed
+      # 6️⃣ Optional: Install kubelogin if needed
       - name: Install kubelogin
         run: |
           curl -LO https://github.com/Azure/kubelogin/releases/latest/download/kubelogin-linux-amd64.zip
@@ -46,22 +47,22 @@ jobs:
           sudo mv bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
           sudo chmod +x /usr/local/bin/kubelogin
 
-      # Get AKS credentials
+      # 7️⃣ Get AKS credentials
       - name: Get AKS Credentials
         run: |
           az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
 
-      # Update kubeconfig for kubelogin
+      # 8️⃣ Update kubeconfig for kubelogin
       - name: Update kubeconfig for kubelogin
         run: |
           kubelogin convert-kubeconfig -l azurecli
 
-      # Update deployment YAML with new image tag
+      # 9️⃣ Update deployment YAML with new image tag
       - name: Update Deployment Image
         run: |
           sed -i "s|image: .*|image: ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}|" DockerAKSWebApp/k8s/deployment.yaml
 
-      # Deploy to AKS
+      # 🔟 Deploy to AKS and wait for rollout
       - name: Deploy to AKS
         run: |
           kubectl apply -f DockerAKSWebApp/k8s/deployment.yaml
