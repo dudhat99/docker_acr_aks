@@ -1,4 +1,4 @@
-﻿name: Build and Deploy Docker .NET App to Azure App Service,AKS
+﻿name: Build and Deploy Docker .NET App to AKS
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ on:
 env:
   ACR_LOGIN_SERVER: containerregisteryrgelete.azurecr.io
   IMAGE_NAME: dockerakswebapp
-  TAG: latest
+  TAG: ${{ github.sha }}   # Unique tag per commit
 
 jobs:
   build-and-deploy:
@@ -24,13 +24,9 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Login to ACR 
+      # Login to ACR (uses SP from Azure Login)
       - name: Login to ACR
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ env.ACR_LOGIN_SERVER }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+        run: az acr login --name containerregisteryrgelete
 
       # Build Docker image
       - name: Build Docker Image
@@ -42,6 +38,7 @@ jobs:
         run: |
           docker push ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
 
+      # Optional: install kubelogin if needed
       - name: Install kubelogin
         run: |
           curl -LO https://github.com/Azure/kubelogin/releases/latest/download/kubelogin-linux-amd64.zip
@@ -49,16 +46,18 @@ jobs:
           sudo mv bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
           sudo chmod +x /usr/local/bin/kubelogin
 
-
+      # Get AKS credentials
       - name: Get AKS Credentials
         run: |
           az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
 
+      # Update kubeconfig for kubelogin
       - name: Update kubeconfig for kubelogin
         run: |
           kubelogin convert-kubeconfig -l azurecli
 
+      # Deploy to AKS
       - name: Deploy to AKS
         run: |
-         kubectl apply -f DockerAKSWebApp/k8s/deployment.yaml
-         kubectl apply -f DockerAKSWebApp/k8s/service.yaml
+          kubectl set image deployment/dockerakswebapp dockerakswebapp=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} --record
+          kubectl rollout status deployment/dockerakswebapp
