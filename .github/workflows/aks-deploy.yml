@@ -42,21 +42,6 @@ jobs:
         run: |
           docker push ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
 
-      # Deploy App Service to pull this latest image from ACR
-      - name: Update App Service to use new image
-        run: |
-          az webapp config container set \
-            --name dockerakswebapp \
-            --resource-group RGDelete \
-            --docker-custom-image-name ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} \
-            --docker-registry-server-url https://${{ env.ACR_LOGIN_SERVER }}
-
-      # Restart to pull latest image
-      - name: Restart App Service
-        run: |
-          az webapp restart \
-            --name dockerdemoapp \
-            --resource-group DeleteRG
 
       - name: Get AKS Credentials
         run: |
