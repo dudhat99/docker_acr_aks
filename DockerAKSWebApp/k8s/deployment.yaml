@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dockerakswebapp
+  name: dockerapp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dockerakswebapp
+      app: dockerapp
   template:
     metadata:
       labels:
-        app: dockerakswebapp
+        app: dockerapp
     spec:
       containers:
-      - name: dockerakswebapp
+      - name: dockerapp
         image: $ACR_LOGIN_SERVER/$IMAGE_NAME:$TAG
         ports:
         - containerPort: 80
