@@ -62,4 +62,5 @@ jobs:
         run: |
          kubectl apply -f DockerAKSWebApp/k8s/deployment.yaml
          kubectl apply -f DockerAKSWebApp/k8s/service.yaml
+         kubectl apply -f DockerAKSWebApp/k8s/ingress.yaml
          kubectl rollout status deployment/dockerakswebapp
