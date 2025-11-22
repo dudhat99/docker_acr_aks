@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: dockerakswebapp
-        image: containerregisteryrgelete.azurecr.io/akswebappimg:latest
+        image: acrdelete.azurecr.io/akswebappimg:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
