@@ -6,7 +6,7 @@ on:
   workflow_dispatch: 
 
 env:
-  ACR_LOGIN_SERVER: containerregisteryrgelete.azurecr.io
+  ACR_LOGIN_SERVER: acrdelete.azurecr.io
   IMAGE_NAME: akswebappimg
   TAG: latest
 
