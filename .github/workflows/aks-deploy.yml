@@ -1,10 +1,9 @@
-﻿name: Build and Deploy Docker .NET App to AKS
-
+﻿name: Build and Deploy Docker .NET App to Azure App Service,AKS
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch: 
 
 env:
   ACR_LOGIN_SERVER: acrdelete.azurecr.io
@@ -19,13 +18,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Login to Azure
+      # Login to Azure using Service Principal
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Login to ACR securely
+      # Login to ACR 
       - name: Login to ACR
         uses: azure/docker-login@v1
         with:
@@ -33,21 +32,16 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      # 🔥 Build Docker Image for AMD64 (IMPORTANT)
-      - name: Build Docker Image (AMD64)
+      # Build Docker image
+      - name: Build Docker Image
         run: |
-          docker build \
-            --platform linux/amd64 \
-            -t ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} \
-            -f DockerAKSWebApp/Dockerfile \
-            DockerAKSWebApp
+          docker build -t ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} -f DockerAKSWebApp/Dockerfile DockerAKSWebApp
 
-      # Push to ACR
+      # Push image to ACR
       - name: Push Docker Image
         run: |
           docker push ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
 
-      # Install kubelogin
       - name: Install kubelogin
         run: |
           curl -LO https://github.com/Azure/kubelogin/releases/latest/download/kubelogin-linux-amd64.zip
@@ -55,23 +49,18 @@ jobs:
           sudo mv bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
           sudo chmod +x /usr/local/bin/kubelogin
 
-      # Get AKS credentials
+
       - name: Get AKS Credentials
         run: |
-          az aks get-credentials \
-            --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} \
-            --name ${{ secrets.AKS_CLUSTER_NAME }} \
-            --overwrite-existing
+          az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
 
-      # Convert kubeconfig for kubelogin
-      - name: Convert kubeconfig for kubelogin
+      - name: Update kubeconfig for kubelogin
         run: |
           kubelogin convert-kubeconfig -l azurecli
 
-      # Deploy to AKS
       - name: Deploy to AKS
         run: |
-          kubectl apply -f DockerAKSWebApp/k8s/deployment.yaml
-          kubectl apply -f DockerAKSWebApp/k8s/service.yaml
-          kubectl apply -f DockerAKSWebApp/k8s/ingress.yaml
-          kubectl rollout status deployment/dockerakswebapp --timeout=120s
+         kubectl apply -f DockerAKSWebApp/k8s/deployment.yaml
+         kubectl apply -f DockerAKSWebApp/k8s/service.yaml
+         kubectl apply -f DockerAKSWebApp/k8s/ingress.yaml
+         kubectl rollout status deployment/dockerakswebapp
