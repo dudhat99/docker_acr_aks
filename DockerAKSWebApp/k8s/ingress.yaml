@@ -3,9 +3,8 @@ kind: Ingress
 metadata:
   name: dockerakswebapp-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: webapprouting.kubernetes.azure.com
 spec:
-  ingressClassName: nginx
   rules:
   - http:
       paths:
@@ -13,6 +12,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: dockerapp-svc
+            name: dockerakswebapp-svc
             port:
               number: 80

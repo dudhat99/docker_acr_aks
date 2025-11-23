@@ -1,14 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: dockerapp-svc
-  labels:
-    app: dockerakswebapp
+  name: dockerakswebapp-svc
 spec:
-  type: LoadBalancer
   selector:
     app: dockerakswebapp
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP
