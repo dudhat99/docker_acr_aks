@@ -9,7 +9,7 @@ spec:
   tls:
     - hosts:
         - dockerakswebapp.centralindia.aksapp.io
-      secretName: dockerakswebapp-tls
+          secretName: dockerakswebapp-tls
   rules:
     - host: dockerakswebapp.centralindia.aksapp.io
       http:
