@@ -14,7 +14,7 @@ spec:
     - host: dockerakswebapp.centralindia.aksapp.io
       http:
         paths:
-          - path: /
+          - path: dockerakswebapp
             pathType: Prefix
             backend:
               service:
