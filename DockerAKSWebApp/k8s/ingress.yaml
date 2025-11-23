@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+﻿apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: dockerakswebapp-ingress
@@ -14,7 +14,7 @@ spec:
     - host: dockerakswebapp.centralindia.aksapp.io
       http:
         paths:
-          - path: dockerakswebapp
+          - path: /                    # ✅ must start with '/'
             pathType: Prefix
             backend:
               service:
