@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: dockerakswebapp-ingress
   annotations:
-    kubernetes.io/ingress.class: webapprouting.kubernetes.azure.com/nginx
+    kubernetes.io/ingress.class: webapprouting.kubernetes.azure.com
 spec:
   rules:
     - http:
