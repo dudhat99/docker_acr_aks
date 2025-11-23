@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dockerakswebapp
+  name: dockerakswebapp-deploy
   labels:
     app: dockerakswebapp
 spec:
@@ -15,7 +15,10 @@ spec:
         app: dockerakswebapp
     spec:
       containers:
-      - name: dockerakswebapp
-        image: acrdelete.azurecr.io/akswebappimg:latest
-        ports:
-        - containerPort: 8080
+        - name: dockerakswebapp
+          image: acrdelete.azurecr.io/akswebappimg:latest
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+      imagePullSecrets:
+        - name: acr-pull-secret
