@@ -16,4 +16,3 @@ spec:
             name: dockerapp-svc
             port:
               number: 80
-              
