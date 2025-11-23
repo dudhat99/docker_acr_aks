@@ -6,7 +6,8 @@ metadata:
     kubernetes.io/ingress.class: webapprouting.kubernetes.azure.com
 spec:
   rules:
-    - http:
+    - host: dockerakswebapp.centralindia.aksapp.io
+      http:
         paths:
           - path: /
             pathType: Prefix
