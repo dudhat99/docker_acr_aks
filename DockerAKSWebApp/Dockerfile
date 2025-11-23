@@ -17,4 +17,4 @@ RUN dotnet publish -c Release -o /publish
 FROM base AS final
 WORKDIR /app
 COPY --from=build /publish .
-ENTRYPOINT ["dotnet", "DockerAKSWebApp.dll"]
+ENTRYPOINT ["dotnet", "DockerAKSWebApp.dll"] 
