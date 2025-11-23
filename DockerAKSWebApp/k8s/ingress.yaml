@@ -6,6 +6,10 @@ metadata:
     kubernetes.io/ingress.class: webapprouting.kubernetes.azure.com
 spec:
   ingressClassName: webapprouting.kubernetes.azure.com
+  tls:
+    - hosts:
+        - dockerakswebapp.centralindia.aksapp.io
+      secretName: dockerakswebapp-tls
   rules:
     - host: dockerakswebapp.centralindia.aksapp.io
       http:
